@@ -1,0 +1,1 @@
+// (Optionnel) Fonctions pour valider les formulaires (email, mot de passe, etc.)

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "97319163599",
+    "project_id": "glpi-3c29f",
+    "storage_bucket": "glpi-3c29f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:97319163599:android:789bee13e9bfb2dc1c49ba",
+        "android_client_info": {
+          "package_name": "com.example.glpi_tech_scanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwocJdlQQqvQ4qP5VfyWpnLiaVHJmlE60"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

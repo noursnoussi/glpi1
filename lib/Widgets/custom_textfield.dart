@@ -1,0 +1,1 @@
+ // Widget personnalisé pour les champs de saisie (email, mot de passe, etc.)
