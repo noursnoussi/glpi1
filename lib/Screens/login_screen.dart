@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
-import '../Services/auth_service.dart';
+import '../Services/auth_services.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,6 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
   bool _isLoading = false;
 
   @override
@@ -22,23 +23,49 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
+  // 🔹 Connexion utilisateur
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      final success = await AuthService().login(
+      final user = await _authService.signIn(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
       setState(() => _isLoading = false);
 
-      if (success && mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+      if (user != null && mounted) {
+        if (user.emailVerified) {
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text("Veuillez vérifier votre email avant de continuer."),
+              backgroundColor: Colors.orange,
+              duration: const Duration(seconds: 5),
+              action: SnackBarAction(
+                label: 'Renvoyer',
+                textColor: Colors.white,
+                onPressed: () async {
+                  bool sent = await _authService.resendVerificationEmail();
+                  if (sent && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Email de vérification envoyé !"),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          );
+        }
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Identifiants incorrects'),
+            content: Text("Email ou mot de passe incorrect."),
             backgroundColor: Colors.red,
           ),
         );
@@ -51,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
 
-      // ✅ Même AppBar que Reset Password
       appBar: AppBar(
         title: const Text(
           'Connexion',
@@ -69,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: 50),
 
-              // 🛡️ Icône
+              // 🛡️ Icône principale
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -112,7 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   filled: true,
                   fillColor: Colors.grey.shade50,
                 ),
-                validator: (v) => v!.isEmpty ? "Entrez votre email" : null,
+                validator: (v) {
+                  if (v == null || v.isEmpty) return "Entrez votre email";
+                  if (!v.contains('@')) return "Email invalide";
+                  return null;
+                },
               ),
 
               const SizedBox(height: 15),
@@ -135,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 25),
 
-              // ✅ Bouton Login
+              // ✅ Bouton Connexion
               _isLoading
                   ? const CircularProgressIndicator()
                   : SizedBox(
@@ -158,7 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: 20),
 
-              // ✅ Lien reset password
+              // ✅ Lien "Mot de passe oublié"
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/reset-password');

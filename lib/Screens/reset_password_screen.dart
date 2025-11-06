@@ -1,6 +1,5 @@
-// lib/screens/reset_password_screen.dart
-// Page de réinitialisation du mot de passe
 import 'package:flutter/material.dart';
+import '../Services/auth_services.dart'; // 🔹 Import de ton service FirebaseAuthService
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -15,6 +14,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool _isLoading = false;
   bool _emailSent = false;
 
+  // 🔹 Instance de ton service FirebaseAuthService
+  final AuthService _authService = AuthService();
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -25,13 +27,23 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simule l'envoi d'un email
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        // 🔹 Appel réel à Firebase
+        await _authService.resetPassword(_emailController.text.trim());
 
-      setState(() {
-        _isLoading = false;
-        _emailSent = true;
-      });
+        setState(() {
+          _isLoading = false;
+          _emailSent = true;
+        });
+      } catch (e) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur : $e'),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
     }
   }
 
@@ -39,8 +51,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Réinitialiser le mot de passe',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+        title: const Text(
+          'Réinitialiser le mot de passe',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
       ),
@@ -79,34 +93,31 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
           // Titre
           const Center(
-  child: Text(
-    'Mot de passe oublié ?',
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      fontSize: 28,
-      fontWeight: FontWeight.bold,
-      color: Colors.black87,
-    ),
-  ),
-),
-
+            child: Text(
+              'Mot de passe oublié ?',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
 
           const SizedBox(height: 12),
 
           // Description
           Center(
-  child: Text(
-    'Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.',
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      fontSize: 15,
-      color: Colors.grey.shade700,
-      height: 1.5,
-    ),
-  ),
-),
-
-
+            child: Text(
+              'Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.grey,
+                height: 1.5,
+              ),
+            ),
+          ),
 
           const SizedBox(height: 40),
 
@@ -200,8 +211,6 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     return Column(
       children: [
         const SizedBox(height: 60),
-
-        // Icône de succès
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
@@ -214,10 +223,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             color: Colors.green,
           ),
         ),
-
         const SizedBox(height: 32),
-
-        // Titre
         const Text(
           'Email envoyé !',
           style: TextStyle(
@@ -226,21 +232,16 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             color: Colors.black87,
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Message
         Text(
-          'Nous avons envoyé un lien de réinitialisation à :',
+          'Un lien de réinitialisation a été envoyé à :',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 15,
             color: Colors.grey.shade700,
           ),
         ),
-
         const SizedBox(height: 8),
-
         Text(
           _emailController.text,
           style: const TextStyle(
@@ -249,10 +250,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             color: Colors.blueAccent,
           ),
         ),
-
         const SizedBox(height: 32),
-
-        // Bouton retour
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
@@ -271,10 +269,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
             ),
           ),
         ),
-
         const SizedBox(height: 16),
-
-        // Renvoyer l'email
         TextButton(
           onPressed: () {
             setState(() => _emailSent = false);
