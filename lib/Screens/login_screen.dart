@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (user != null && mounted) {
         if (user.emailVerified) {
-          Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/scanner');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
