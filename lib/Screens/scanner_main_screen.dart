@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'scanner_screen.dart';
 import 'profile_screen.dart';
+import 'data_screen.dart'; // ✅ on l’importe pour que la page ait aussi la tab bar
+import 'crud.dart'; // ✅ ton futur écran CRUD
 
 class ScannerMainScreen extends StatefulWidget {
   const ScannerMainScreen({super.key});
@@ -14,26 +16,14 @@ class _ScannerMainScreenState extends State<ScannerMainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const ScannerScreen(),
-    const ProfileScreen(),
+    const ScannerScreen(), // index 0
+    const ProfileScreen(), // index 1
+    const CrudScreen(),    // index 2 ✅ nouvelle page CRUD
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _currentIndex == 0 ? 'Scanner' : 'Profil',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.blueAccent,
-        iconTheme: const IconThemeData(color: Colors.white),
-        automaticallyImplyLeading: false, // Enlève le bouton retour
-      ),
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -52,6 +42,10 @@ class _ScannerMainScreenState extends State<ScannerMainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Profil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings), // ⚙️ icône CRUD
+            label: 'CRUD',
           ),
         ],
       ),

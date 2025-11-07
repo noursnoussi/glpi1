@@ -18,6 +18,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         centerTitle: true,
         backgroundColor: Colors.blueAccent,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Center(
         child: SingleChildScrollView(
