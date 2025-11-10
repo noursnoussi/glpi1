@@ -1,9 +1,9 @@
 // lib/screens/scanner_main_screen.dart
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 import 'scanner_screen.dart';
 import 'profile_screen.dart';
-import 'data_screen.dart'; // ✅ on l’importe pour que la page ait aussi la tab bar
-import 'crud.dart'; // ✅ ton futur écran CRUD
+import 'crud.dart';
 
 class ScannerMainScreen extends StatefulWidget {
   const ScannerMainScreen({super.key});
@@ -16,9 +16,9 @@ class _ScannerMainScreenState extends State<ScannerMainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const ScannerScreen(), // index 0
-    const ProfileScreen(), // index 1
-    const CrudScreen(),    // index 2 ✅ nouvelle page CRUD
+    const ScannerScreen(),  // index 0
+    const ProfileScreen(),  // index 1
+    const CrudScreen(),     // index 2
   ];
 
   @override
@@ -32,19 +32,30 @@ class _ScannerMainScreenState extends State<ScannerMainScreen> {
             _currentIndex = index;
           });
         },
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
+        backgroundColor: Colors.white,
+        elevation: 8,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.w500,
+          fontSize: 12,
+        ),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.qr_code_scanner),
             label: 'Scanner',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.person_outline),
             label: 'Profil',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings), // ⚙️ icône CRUD
+            icon: Icon(Icons.settings_outlined),
             label: 'CRUD',
           ),
         ],

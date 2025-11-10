@@ -1,5 +1,6 @@
 // lib/screens/scanner_screen.dart
 import 'package:flutter/material.dart';
+import '../utils/constants.dart';
 
 class ScannerScreen extends StatelessWidget {
   const ScannerScreen({super.key});
@@ -7,36 +8,55 @@ class ScannerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'Scanner',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: AppColors.primary,
+        elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      backgroundColor: Colors.grey[100],
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSizes.padding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Carte de bienvenue
+            const SizedBox(height: 8),
+
+            // Carte de bienvenue moderne
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Colors.blueAccent, Colors.blue],
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary,
+                    AppColors.primary.withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppSizes.borderRadius),
               ),
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: Colors.white,
-                    size: 40,
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.info_outline,
+                      color: Colors.white,
+                      size: 32,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -47,7 +67,7 @@ class ScannerScreen extends StatelessWidget {
                           'Bienvenue !',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -55,7 +75,7 @@ class ScannerScreen extends StatelessWidget {
                         Text(
                           'Scannez vos documents techniques',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withOpacity(0.95),
                             fontSize: 14,
                           ),
                         ),
@@ -74,6 +94,7 @@ class ScannerScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -82,7 +103,7 @@ class ScannerScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildStatCard(
-                    icon: Icons.document_scanner,
+                    icon: Icons.document_scanner_outlined,
                     iconColor: Colors.green,
                     count: '42',
                     label: 'Scans',
@@ -91,7 +112,7 @@ class ScannerScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _buildStatCard(
-                    icon: Icons.check_circle,
+                    icon: Icons.check_circle_outline,
                     iconColor: Colors.orange,
                     count: '38',
                     label: 'Validés',
@@ -102,36 +123,39 @@ class ScannerScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Bouton de scan
+            // Bouton de scan centré et moderne
             Center(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  // Ici, après le scan, on redirige vers la page Data
-                  Navigator.pushNamed(
-                    context,
-                    '/data',
-                    arguments: {
-                      'scannedData': 'Exemple de données scannées',
-                      'timestamp': DateTime.now(),
-                    },
-                  );
-                },
-                icon: const Icon(Icons.qr_code_scanner, size: 28),
-                label: const Text(
-                  'Lancer un scan',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 16,
+              child: SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/data',
+                      arguments: {
+                        'scannedData': 'Exemple de données scannées',
+                        'timestamp': DateTime.now(),
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.qr_code_scanner, size: 24),
+                  label: const Text(
+                    'Lancer un scan',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                    ),
                   ),
-                  elevation: 4,
                 ),
               ),
             ),
@@ -144,6 +168,7 @@ class ScannerScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 12),
@@ -151,6 +176,8 @@ class ScannerScreen extends StatelessWidget {
             _buildHistoryItem('Document #001', '29 Oct 2025'),
             _buildHistoryItem('Document #002', '28 Oct 2025'),
             _buildHistoryItem('Document #003', '27 Oct 2025'),
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -167,31 +194,29 @@ class ScannerScreen extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Column(
         children: [
-          Icon(icon, color: iconColor, size: 40),
+          Icon(icon, color: iconColor, size: 36),
           const SizedBox(height: 12),
           Text(
             count,
             style: const TextStyle(
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
-              color: Colors.grey[600],
+              color: AppColors.textSecondary,
               fontSize: 14,
             ),
           ),
@@ -206,26 +231,23 @@ class ScannerScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.3),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.1),
+              color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.description,
-              color: Colors.blue,
+            child: Icon(
+              Icons.description_outlined,
+              color: AppColors.primary,
               size: 24,
             ),
           ),
@@ -237,24 +259,25 @@ class ScannerScreen extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   date,
                   style: TextStyle(
-                    color: Colors.grey[600],
+                    color: AppColors.textSecondary,
                     fontSize: 13,
                   ),
                 ),
               ],
             ),
           ),
-          const Icon(
+          Icon(
             Icons.arrow_forward_ios,
-            color: Colors.grey,
+            color: AppColors.textSecondary,
             size: 16,
           ),
         ],
