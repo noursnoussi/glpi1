@@ -52,7 +52,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               backgroundColor: AppColors.success,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
               ),
             ),
           );
@@ -60,22 +60,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         }
       } catch (e) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(child: Text('Erreur : $e')),
-              ],
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text('Erreur : $e')),
+                ],
+              ),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-        );
+          );
+        }
       }
     }
   }
@@ -86,284 +88,394 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          'Modifier le profil',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: SingleChildScrollView(
+      body: SafeArea(
         child: Column(
           children: [
-            // En-tête avec photo de profil
+            // En-tête personnalisé avec bouton retour
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 32),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary.withOpacity(0.1),
-                    Colors.white,
-                  ],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
-              child: Column(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              color: Colors.white,
+              child: Row(
                 children: [
-                  Stack(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 3,
-                          ),
-                        ),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColors.primary.withOpacity(0.1),
-                          backgroundImage: user?.photoURL != null
-                              ? NetworkImage(user!.photoURL!)
-                              : null,
-                          child: user?.photoURL == null
-                              ? Icon(
-                                  Icons.person,
-                                  size: 50,
-                                  color: AppColors.primary,
-                                )
-                              : null,
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 2,
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.camera_alt,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: AppColors.textPrimary,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Modifier le profil',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Formulaire
-            Padding(
-              padding: const EdgeInsets.all(AppSizes.paddingLarge),
-              child: Form(
-                key: _formKey,
+            // Contenu scrollable
+            Expanded(
+              child: SingleChildScrollView(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
-
-                    // Champ Nom
-                    const Text(
-                      'Nom complet',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+                    // En-tête avec photo de profil moderne
                     Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 40),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-                        border: Border.all(
-                          color: AppColors.border.withOpacity(0.3),
-                          width: 1,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primary.withOpacity(0.08),
+                            Colors.white,
+                          ],
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
                         ),
                       ),
-                      child: TextFormField(
-                        controller: _nameController,
-                        decoration: InputDecoration(
-                          hintText: 'Entrez votre nom',
-                          hintStyle: TextStyle(
-                            color: AppColors.textHint,
-                            fontSize: 15,
+                      child: Column(
+                        children: [
+                          Stack(
+                            children: [
+                              // Photo de profil
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      blurRadius: 20,
+                                      spreadRadius: 3,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.primary.withOpacity(0.3),
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 60,
+                                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                                    backgroundImage: user?.photoURL != null
+                                        ? NetworkImage(user!.photoURL!)
+                                        : null,
+                                    child: user?.photoURL == null
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 60,
+                                            color: AppColors.primary,
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              // Badge caméra
+                              Positioned(
+                                bottom: 4,
+                                right: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.primary.withOpacity(0.3),
+                                        blurRadius: 8,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          prefixIcon: Icon(
-                            Icons.person_outline,
-                            color: AppColors.textSecondary,
-                            size: AppSizes.iconSize,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
-                          ),
-                        ),
-                        validator: (value) => value == null || value.isEmpty
-                            ? 'Veuillez entrer votre nom'
-                            : null,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Champ Email (désactivé)
-                    const Text(
-                      'Email',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.inputBackground,
-                        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-                        border: Border.all(
-                          color: AppColors.border.withOpacity(0.3),
-                          width: 1,
-                        ),
-                      ),
-                      child: TextFormField(
-                        controller: _emailController,
-                        enabled: false,
-                        decoration: InputDecoration(
-                          hintStyle: TextStyle(
-                            color: AppColors.textHint,
-                            fontSize: 15,
-                          ),
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: AppColors.textSecondary,
-                            size: AppSizes.iconSize,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-                    
-                    // Note informative
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.info_outline,
-                          size: 16,
-                          color: AppColors.textSecondary,
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            "L'email ne peut pas être modifié",
+                          const SizedBox(height: 16),
+                          Text(
+                            'Modifier la photo de profil',
                             style: TextStyle(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
+                              fontSize: 14,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
-                    const SizedBox(height: 40),
+                    // Formulaire
+                    Padding(
+                      padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Section Informations
+                            _buildSectionHeader('Informations personnelles'),
+                            const SizedBox(height: 16),
 
-                    // Bouton Enregistrer
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _isLoading ? null : _saveProfile,
-                        icon: _isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
+                            // Champ Nom
+                            _buildFieldLabel('Nom complet', required: true),
+                            const SizedBox(height: 8),
+                            _buildModernTextField(
+                              controller: _nameController,
+                              hintText: 'Entrez votre nom',
+                              icon: Icons.person_outline,
+                              validator: (value) => value == null || value.isEmpty
+                                  ? 'Veuillez entrer votre nom'
+                                  : null,
+                            ),
+
+                            const SizedBox(height: 24),
+
+                            // Champ Email (désactivé)
+                            _buildFieldLabel('Email', required: false),
+                            const SizedBox(height: 8),
+                            _buildModernTextField(
+                              controller: _emailController,
+                              hintText: '',
+                              icon: Icons.email_outlined,
+                              enabled: false,
+                            ),
+
+                            const SizedBox(height: 10),
+                            
+                            // Note informative élégante
+                            Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(0.05),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.blue.withOpacity(0.1),
+                                  width: 1,
                                 ),
-                              )
-                            : const Icon(Icons.save_outlined, size: 20),
-                        label: Text(
-                          _isLoading ? 'Enregistrement...' : 'Enregistrer',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-                          ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.info_outline,
+                                    size: 18,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      "L'adresse email ne peut pas être modifiée pour des raisons de sécurité",
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.blue.shade700,
+                                        height: 1.4,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 40),
+
+                            // Boutons d'action
+                            Row(
+                              children: [
+                                // Bouton Annuler
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () => Navigator.pop(context),
+                                    icon: const Icon(Icons.close_outlined, size: 20),
+                                    label: const Text(
+                                      'Annuler',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    style: OutlinedButton.styleFrom(
+                                      foregroundColor: AppColors.textSecondary,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      side: BorderSide(
+                                        color: AppColors.border,
+                                        width: 1.5,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                // Bouton Enregistrer
+                                Expanded(
+                                  flex: 2,
+                                  child: ElevatedButton.icon(
+                                    onPressed: _isLoading ? null : _saveProfile,
+                                    icon: _isLoading
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Icon(Icons.save_outlined, size: 20),
+                                    label: Text(
+                                      _isLoading ? 'Enregistrement...' : 'Enregistrer',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.3,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.primary,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 20),
+                          ],
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Bouton Annuler
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close_outlined, size: 20),
-                        label: const Text(
-                          'Annuler',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.textSecondary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(
-                            color: AppColors.border,
-                            width: 1.5,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSizes.borderRadius),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Row(
+      children: [
+        Container(
+          width: 4,
+          height: 20,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.textPrimary,
+            letterSpacing: 0.3,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFieldLabel(String label, {required bool required}) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        if (required) ...[
+          const SizedBox(width: 4),
+          const Text(
+            '*',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildModernTextField({
+    required TextEditingController controller,
+    required String hintText,
+    required IconData icon,
+    bool enabled = true,
+    String? Function(String?)? validator,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: enabled ? Colors.white : AppColors.inputBackground,
+        borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+        border: Border.all(
+          color: AppColors.border.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: enabled
+            ? [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.02),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      child: TextFormField(
+        controller: controller,
+        enabled: enabled,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          color: enabled ? AppColors.textPrimary : AppColors.textSecondary,
+        ),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(
+            color: AppColors.textHint,
+            fontSize: 15,
+          ),
+          prefixIcon: Icon(
+            icon,
+            color: enabled ? AppColors.textSecondary : AppColors.textHint,
+            size: AppSizes.iconSize,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18,
+            horizontal: 20,
+          ),
+        ),
+        validator: validator,
       ),
     );
   }

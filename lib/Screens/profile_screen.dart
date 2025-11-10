@@ -13,33 +13,13 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text(
-          '',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-            fontSize: 20,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             // En-tête moderne avec dégradé
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.only(top: 32, bottom: 40),
+              padding: const EdgeInsets.only(top: 60, bottom: 40),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
