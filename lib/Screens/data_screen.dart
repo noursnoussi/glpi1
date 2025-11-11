@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
-import 'crud.dart';
 import 'profile_screen.dart';
-
+import 'collections_list_screen.dart';
+import 'scanner_screen.dart';
 class DataScreen extends StatefulWidget {
   const DataScreen({super.key});
 
@@ -22,7 +22,8 @@ class _DataScreenState extends State<DataScreen> {
     final List<Widget> _pages = [
       _buildDataScreenContent(scannedData, timestamp),
       const ProfileScreen(),
-      const CrudScreen(),
+      const ScannerScreen(),
+      const CollectionsListScreen(),
     ];
 
     return Scaffold(
@@ -70,14 +71,15 @@ class _DataScreenState extends State<DataScreen> {
             icon: Icon(Icons.qr_code_scanner),
             label: 'Scanner',
           ),
-          BottomNavigationBarItem(
+           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             label: 'Profil',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_outlined),
-            label: 'CRUD',
+           BottomNavigationBarItem(
+            icon: Icon(Icons.storage_outlined),
+            label: 'BD',
           ),
+         
         ],
       ),
     );

@@ -4,16 +4,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../utils/constants.dart';
 
 class CrudScreen extends StatefulWidget {
-  const CrudScreen({super.key});
+  final String collectionName;
+  
+  const CrudScreen({
+    super.key,
+    this.collectionName = 'parc_informatique_laptops', // Par défaut
+  });
 
   @override
   State<CrudScreen> createState() => _CrudScreenState();
 }
 
 class _CrudScreenState extends State<CrudScreen> {
-  final CollectionReference laptopsCollection =
-      FirebaseFirestore.instance.collection('parc_informatique_laptops');
-  
+  late CollectionReference collection;
   String _searchQuery = '';
   List<String> _allFields = [];
   bool _isLoadingFields = true;
@@ -21,13 +24,28 @@ class _CrudScreenState extends State<CrudScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialiser la collection dynamiquement
+    collection = FirebaseFirestore.instance.collection(widget.collectionName);
     _loadDynamicFields();
+  }
+
+  // Formater le nom de la collection pour l'affichage
+  String get _displayCollectionName {
+    return widget.collectionName
+        .replaceAll('_', ' ')
+        .split(' ')
+        .map((word) => word.isNotEmpty 
+            ? word[0].toUpperCase() + word.substring(1).toLowerCase() 
+            : '')
+        .join(' ');
   }
 
   // 🔥 Charger tous les champs uniques de la collection
   Future<void> _loadDynamicFields() async {
+    setState(() => _isLoadingFields = true);
+    
     try {
-      final snapshot = await laptopsCollection.get();
+      final snapshot = await collection.get();
       Set<String> fieldsSet = {};
       
       for (var doc in snapshot.docs) {
@@ -40,9 +58,8 @@ class _CrudScreenState extends State<CrudScreen> {
         _isLoadingFields = false;
       });
     } catch (e) {
-      setState(() {
-        _isLoadingFields = false;
-      });
+      setState(() => _isLoadingFields = false);
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -58,34 +75,29 @@ class _CrudScreenState extends State<CrudScreen> {
   void _openForm({DocumentSnapshot? doc}) async {
     final isEditing = doc != null;
     
-    // Pour l'ajout: recharger les champs pour avoir la structure la plus récente
     if (!isEditing) {
       await _loadDynamicFields();
     }
 
-    // Récupérer les champs du document ou utiliser tous les champs connus
     List<String> fieldsToShow = _allFields;
-    
     if (isEditing) {
       final docData = doc.data() as Map<String, dynamic>;
-      // Combiner les champs du document avec tous les champs connus
       Set<String> combinedFields = {...docData.keys, ..._allFields};
       fieldsToShow = combinedFields.toList()..sort();
     }
 
-    // Créer les controllers pour chaque champ
     Map<String, TextEditingController> controllers = {};
     final idController = TextEditingController(text: isEditing ? doc.id : '');
     
     for (var field in fieldsToShow) {
       controllers[field] = TextEditingController(
-        text: isEditing && doc.data() != null && (doc.data() as Map<String, dynamic>).containsKey(field)
+        text: isEditing && doc.data() != null && 
+              (doc.data() as Map<String, dynamic>).containsKey(field)
             ? (doc[field] ?? '').toString()
             : '',
       );
     }
 
-    // Controller pour ajouter un nouveau champ
     final newFieldController = TextEditingController();
     final newValueController = TextEditingController();
 
@@ -123,7 +135,7 @@ class _CrudScreenState extends State<CrudScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              isEditing ? "Modifier l'appareil" : "Ajouter un appareil",
+                              isEditing ? "Modifier l'élément" : "Ajouter un élément",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 20,
@@ -147,7 +159,7 @@ class _CrudScreenState extends State<CrudScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             // 🆔 Champ ID (uniquement pour l'ajout)
-                            if (!isEditing) ...[
+                            if (!isEditing) ...[ 
                               const Text(
                                 "ID du document",
                                 style: TextStyle(
@@ -188,7 +200,6 @@ class _CrudScreenState extends State<CrudScreen> {
                                             _getIconForField(field),
                                           ),
                                         ),
-                                        // Bouton pour supprimer le champ
                                         IconButton(
                                           icon: const Icon(
                                             Icons.delete_outline,
@@ -312,14 +323,11 @@ class _CrudScreenState extends State<CrudScreen> {
                               icon: Icon(isEditing ? Icons.save_outlined : Icons.add_circle_outline),
                               label: Text(isEditing ? 'Enregistrer' : 'Ajouter'),
                               onPressed: () async {
-                                // Construire les données dynamiquement avec TOUS les champs affichés
                                 final Map<String, dynamic> data = {};
                                 
-                                // Ajouter tous les champs qui ont une valeur (même vide si présent dans l'interface)
                                 for (var field in fieldsToShow) {
                                   if (controllers[field] != null) {
                                     final value = controllers[field]!.text.trim();
-                                    // On sauvegarde même les champs vides pour garder la structure
                                     data[field] = value;
                                   }
                                 }
@@ -336,16 +344,11 @@ class _CrudScreenState extends State<CrudScreen> {
 
                                 try {
                                   if (isEditing) {
-                                    // Mode modification: 
-                                    // ⚠️ IMPORTANT: On utilise set() avec merge: false pour REMPLACER complètement le document
-                                    // Cela permet de supprimer les champs qui ne sont plus dans fieldsToShow
-                                    await laptopsCollection.doc(doc.id).set(data, SetOptions(merge: false));
+                                    await collection.doc(doc.id).set(data, SetOptions(merge: false));
                                   } else {
-                                    // Mode ajout: utiliser l'ID personnalisé ou auto-généré
                                     final customId = idController.text.trim();
                                     if (customId.isNotEmpty) {
-                                      // Vérifier si l'ID existe déjà
-                                      final docSnapshot = await laptopsCollection.doc(customId).get();
+                                      final docSnapshot = await collection.doc(customId).get();
                                       if (docSnapshot.exists) {
                                         if (context.mounted) {
                                           ScaffoldMessenger.of(context).showSnackBar(
@@ -357,15 +360,14 @@ class _CrudScreenState extends State<CrudScreen> {
                                         }
                                         return;
                                       }
-                                      await laptopsCollection.doc(customId).set(data);
+                                      await collection.doc(customId).set(data);
                                     } else {
-                                      await laptopsCollection.add(data);
+                                      await collection.add(data);
                                     }
                                   }
 
-                                  // Recharger les champs après modification
                                   await _loadDynamicFields();
-
+                                  
                                   if (context.mounted) {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -374,9 +376,7 @@ class _CrudScreenState extends State<CrudScreen> {
                                           children: [
                                             const Icon(Icons.check_circle, color: Colors.white),
                                             const SizedBox(width: 12),
-                                            Text(isEditing
-                                                ? 'Appareil modifié avec succès'
-                                                : 'Appareil ajouté avec succès'),
+                                            Text(isEditing ? 'Élément modifié avec succès' : 'Élément ajouté avec succès'),
                                           ],
                                         ),
                                         backgroundColor: AppColors.success,
@@ -450,8 +450,8 @@ class _CrudScreenState extends State<CrudScreen> {
 
     if (confirm == true) {
       try {
-        await laptopsCollection.doc(id).delete();
-        await _loadDynamicFields(); // Recharger après suppression
+        await collection.doc(id).delete();
+        await _loadDynamicFields();
         
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -460,7 +460,7 @@ class _CrudScreenState extends State<CrudScreen> {
                 children: [
                   Icon(Icons.check_circle, color: Colors.white),
                   SizedBox(width: 12),
-                  Text('Appareil supprimé avec succès'),
+                  Text('Élément supprimé avec succès'),
                 ],
               ),
               backgroundColor: AppColors.success,
@@ -528,6 +528,8 @@ class _CrudScreenState extends State<CrudScreen> {
     if (field.contains('product') || field.contains('produit')) return Icons.qr_code_2;
     if (field.contains('serial')) return Icons.numbers;
     if (field.contains('location') || field.contains('lieu')) return Icons.location_on_outlined;
+    if (field.contains('client')) return Icons.people_outline;
+    if (field.contains('user') || field.contains('utilisateur')) return Icons.person_outline;
     return Icons.text_fields;
   }
 
@@ -536,9 +538,9 @@ class _CrudScreenState extends State<CrudScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(
-          'Gérer les appareils',
-          style: TextStyle(
+        title: Text(
+          _displayCollectionName,
+          style: const TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.w600,
             fontSize: 20,
@@ -547,6 +549,7 @@ class _CrudScreenState extends State<CrudScreen> {
         centerTitle: true,
         backgroundColor: AppColors.primary,
         elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: Colors.white),
@@ -624,10 +627,10 @@ class _CrudScreenState extends State<CrudScreen> {
                   ),
                 ),
 
-                // Liste des appareils
+                // Liste des éléments
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
-                    stream: laptopsCollection.snapshots(),
+                    stream: collection.snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(
@@ -649,7 +652,7 @@ class _CrudScreenState extends State<CrudScreen> {
                           ),
                         );
                       }
-                      
+
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return Center(
                           child: CircularProgressIndicator(color: AppColors.primary),
@@ -658,7 +661,7 @@ class _CrudScreenState extends State<CrudScreen> {
 
                       var docs = snapshot.data!.docs;
 
-                      // Filtrer dynamiquement selon tous les champs
+                      // Filtrer dynamiquement
                       if (_searchQuery.isNotEmpty) {
                         docs = docs.where((doc) {
                           final data = doc.data() as Map<String, dynamic>;
@@ -673,15 +676,17 @@ class _CrudScreenState extends State<CrudScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                _searchQuery.isEmpty ? Icons.inventory_2_outlined : Icons.search_off,
+                                _searchQuery.isEmpty
+                                    ? Icons.inventory_2_outlined
+                                    : Icons.search_off,
                                 size: 64,
                                 color: AppColors.textSecondary,
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                _searchQuery.isEmpty 
-                                  ? "Aucun appareil trouvé"
-                                  : "Aucun résultat",
+                                _searchQuery.isEmpty
+                                    ? "Aucun élément trouvé"
+                                    : "Aucun résultat",
                                 style: TextStyle(
                                   fontSize: 16,
                                   color: AppColors.textSecondary,
@@ -699,10 +704,10 @@ class _CrudScreenState extends State<CrudScreen> {
                         itemBuilder: (context, index) {
                           final doc = docs[index];
                           final data = doc.data() as Map<String, dynamic>;
-                          
-                          // Afficher dynamiquement les premières valeurs
-                          final displayValues = data.entries.take(3).map((e) => 
-                            '${e.key}: ${e.value}').join(' • ');
+                          final displayValues = data.entries
+                              .take(3)
+                              .map((e) => '${e.key}: ${e.value}')
+                              .join(' • ');
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 12),
@@ -723,7 +728,7 @@ class _CrudScreenState extends State<CrudScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Icon(
-                                  Icons.laptop_mac,
+                                  Icons.description_outlined,
                                   color: AppColors.primary,
                                   size: 24,
                                 ),
@@ -739,7 +744,9 @@ class _CrudScreenState extends State<CrudScreen> {
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
-                                  displayValues.isNotEmpty ? displayValues : 'Aucune donnée',
+                                  displayValues.isNotEmpty
+                                      ? displayValues
+                                      : 'Aucune donnée',
                                   style: TextStyle(
                                     color: AppColors.textSecondary,
                                     fontSize: 13,

@@ -10,7 +10,7 @@ import 'Screens/data_screen.dart';
 import 'Screens/edit_profile_screen.dart';
 import 'Screens/reset_password_screen.dart';
 import 'utils/constants.dart';
-import 'Screens/crud.dart'; // ✅ Ajout pour la page CRUD
+import 'Screens/collections_list_screen.dart';
 
 
 void main() async {
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         '/data': (context) => const DataScreen(),          // Page d'affichage des données scannées
         '/edit-profile': (context) => const EditProfileScreen(),
         '/reset-password': (context) => const ResetPasswordScreen(),
-        '/crud': (context) => const CrudScreen(), // ✅ Nouvelle route
+        '/collections': (context) => const CollectionsListScreen(),
 
       },
     );
