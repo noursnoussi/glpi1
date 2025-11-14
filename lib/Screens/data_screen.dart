@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 import 'profile_screen.dart';
 import 'collections_list_screen.dart';
-import 'scanner_screen.dart';
 class DataScreen extends StatefulWidget {
   const DataScreen({super.key});
 
@@ -22,7 +21,6 @@ class _DataScreenState extends State<DataScreen> {
     final List<Widget> _pages = [
       _buildDataScreenContent(scannedData, timestamp),
       const ProfileScreen(),
-      const ScannerScreen(),
       const CollectionsListScreen(),
     ];
 
